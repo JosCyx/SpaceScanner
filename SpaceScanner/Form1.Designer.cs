@@ -57,30 +57,27 @@
             // 
             // txtPath
             // 
-            this.txtPath.Location = new System.Drawing.Point(123, 54);
-            this.txtPath.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtPath.Location = new System.Drawing.Point(67, 29);
             this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(966, 29);
+            this.txtPath.Size = new System.Drawing.Size(529, 20);
             this.txtPath.TabIndex = 0;
             this.txtPath.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPath_KeyDown);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(51, 59);
-            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label1.Location = new System.Drawing.Point(28, 32);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 25);
+            this.label1.Size = new System.Drawing.Size(33, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Ruta:";
             // 
             // btnScan
             // 
             this.btnScan.BackColor = System.Drawing.SystemColors.Control;
-            this.btnScan.Location = new System.Drawing.Point(1104, 52);
-            this.btnScan.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnScan.Location = new System.Drawing.Point(602, 28);
             this.btnScan.Name = "btnScan";
-            this.btnScan.Size = new System.Drawing.Size(145, 42);
+            this.btnScan.Size = new System.Drawing.Size(79, 23);
             this.btnScan.TabIndex = 2;
             this.btnScan.Text = "Escanear";
             this.btnScan.UseVisualStyleBackColor = false;
@@ -90,42 +87,38 @@
             // 
             this.gridResults.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.gridResults.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridResults.Location = new System.Drawing.Point(57, 159);
-            this.gridResults.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.gridResults.Location = new System.Drawing.Point(31, 86);
             this.gridResults.Name = "gridResults";
             this.gridResults.ReadOnly = true;
             this.gridResults.RowHeadersWidth = 72;
-            this.gridResults.Size = new System.Drawing.Size(1287, 478);
+            this.gridResults.Size = new System.Drawing.Size(702, 259);
             this.gridResults.TabIndex = 3;
             this.gridResults.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.escanearRutaToolStripMenuItem_DoubleClick);
             // 
             // lblTotalSize
             // 
             this.lblTotalSize.AutoSize = true;
-            this.lblTotalSize.Location = new System.Drawing.Point(57, 648);
-            this.lblTotalSize.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblTotalSize.Location = new System.Drawing.Point(31, 351);
             this.lblTotalSize.Name = "lblTotalSize";
-            this.lblTotalSize.Size = new System.Drawing.Size(133, 25);
+            this.lblTotalSize.Size = new System.Drawing.Size(74, 13);
             this.lblTotalSize.TabIndex = 6;
             this.lblTotalSize.Text = "total de la ruta";
             // 
             // lblFreeSize
             // 
             this.lblFreeSize.AutoSize = true;
-            this.lblFreeSize.Location = new System.Drawing.Point(1109, 648);
-            this.lblFreeSize.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblFreeSize.Location = new System.Drawing.Point(605, 351);
             this.lblFreeSize.Name = "lblFreeSize";
-            this.lblFreeSize.Size = new System.Drawing.Size(121, 25);
+            this.lblFreeSize.Size = new System.Drawing.Size(66, 13);
             this.lblFreeSize.TabIndex = 7;
             this.lblFreeSize.Text = "espacio libre";
             // 
             // lblGlobalSize
             // 
             this.lblGlobalSize.AutoSize = true;
-            this.lblGlobalSize.Location = new System.Drawing.Point(1109, 685);
-            this.lblGlobalSize.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblGlobalSize.Location = new System.Drawing.Point(605, 371);
             this.lblGlobalSize.Name = "lblGlobalSize";
-            this.lblGlobalSize.Size = new System.Drawing.Size(130, 25);
+            this.lblGlobalSize.Size = new System.Drawing.Size(72, 13);
             this.lblGlobalSize.TabIndex = 8;
             this.lblGlobalSize.Text = "total del disco";
             // 
@@ -133,10 +126,9 @@
             // 
             this.btnStop.BackColor = System.Drawing.SystemColors.Control;
             this.btnStop.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnStop.Location = new System.Drawing.Point(1250, 52);
-            this.btnStop.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnStop.Location = new System.Drawing.Point(682, 28);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(92, 42);
+            this.btnStop.Size = new System.Drawing.Size(50, 23);
             this.btnStop.TabIndex = 9;
             this.btnStop.Text = "Parar";
             this.btnStop.UseVisualStyleBackColor = false;
@@ -149,48 +141,45 @@
             this.abrirCarpetaToolStripMenuItem,
             this.escanearRutaToolStripMenuItem});
             this.contextMenuGrid.Name = "contextMenuGrid";
-            this.contextMenuGrid.Size = new System.Drawing.Size(212, 76);
+            this.contextMenuGrid.Size = new System.Drawing.Size(145, 48);
             // 
             // abrirCarpetaToolStripMenuItem
             // 
             this.abrirCarpetaToolStripMenuItem.Name = "abrirCarpetaToolStripMenuItem";
-            this.abrirCarpetaToolStripMenuItem.Size = new System.Drawing.Size(211, 36);
+            this.abrirCarpetaToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.abrirCarpetaToolStripMenuItem.Text = "Abrir recurso";
             this.abrirCarpetaToolStripMenuItem.Click += new System.EventHandler(this.abrirRecursoToolStripMenuItem_Click);
             // 
             // escanearRutaToolStripMenuItem
             // 
             this.escanearRutaToolStripMenuItem.Name = "escanearRutaToolStripMenuItem";
-            this.escanearRutaToolStripMenuItem.Size = new System.Drawing.Size(211, 36);
+            this.escanearRutaToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.escanearRutaToolStripMenuItem.Text = "Escanear ruta";
             this.escanearRutaToolStripMenuItem.Click += new System.EventHandler(this.escanearRutaToolStripMenuItem_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(51, 111);
-            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label2.Location = new System.Drawing.Point(28, 60);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 25);
+            this.label2.Size = new System.Drawing.Size(39, 13);
             this.label2.TabIndex = 10;
             this.label2.Text = "Límite:";
             // 
             // txtSize
             // 
-            this.txtSize.Location = new System.Drawing.Point(123, 111);
-            this.txtSize.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtSize.Location = new System.Drawing.Point(67, 60);
             this.txtSize.Name = "txtSize";
-            this.txtSize.Size = new System.Drawing.Size(169, 29);
+            this.txtSize.Size = new System.Drawing.Size(94, 20);
             this.txtSize.TabIndex = 11;
             // 
             // btnAtras
             // 
             this.btnAtras.BackColor = System.Drawing.SystemColors.Control;
             this.btnAtras.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnAtras.Location = new System.Drawing.Point(1250, 102);
-            this.btnAtras.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnAtras.Location = new System.Drawing.Point(682, 55);
             this.btnAtras.Name = "btnAtras";
-            this.btnAtras.Size = new System.Drawing.Size(92, 42);
+            this.btnAtras.Size = new System.Drawing.Size(50, 23);
             this.btnAtras.TabIndex = 12;
             this.btnAtras.Text = "Atrás";
             this.btnAtras.UseVisualStyleBackColor = false;
@@ -201,23 +190,20 @@
             this.txtCacheIndicator.AutoSize = true;
             this.txtCacheIndicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCacheIndicator.ForeColor = System.Drawing.Color.Red;
-            this.txtCacheIndicator.Location = new System.Drawing.Point(1014, 124);
-            this.txtCacheIndicator.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.txtCacheIndicator.Location = new System.Drawing.Point(553, 67);
             this.txtCacheIndicator.Name = "txtCacheIndicator";
-            this.txtCacheIndicator.Size = new System.Drawing.Size(219, 17);
+            this.txtCacheIndicator.Size = new System.Drawing.Size(128, 9);
             this.txtCacheIndicator.TabIndex = 13;
             this.txtCacheIndicator.Text = "Datos cargados desde caché";
             // 
             // menuStrip1
             // 
-            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(28, 28);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.detallesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(11, 4, 0, 4);
-            this.menuStrip1.Size = new System.Drawing.Size(1390, 42);
+            this.menuStrip1.Size = new System.Drawing.Size(747, 24);
             this.menuStrip1.TabIndex = 14;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -227,36 +213,35 @@
             this.vistaDetalladaToolStripMenuItem,
             this.vistaGráficaToolStripMenuItem});
             this.detallesToolStripMenuItem.Name = "detallesToolStripMenuItem";
-            this.detallesToolStripMenuItem.Size = new System.Drawing.Size(61, 34);
+            this.detallesToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.detallesToolStripMenuItem.Text = "Ver";
             // 
             // vistaDetalladaToolStripMenuItem
             // 
             this.vistaDetalladaToolStripMenuItem.Name = "vistaDetalladaToolStripMenuItem";
-            this.vistaDetalladaToolStripMenuItem.Size = new System.Drawing.Size(267, 40);
+            this.vistaDetalladaToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.vistaDetalladaToolStripMenuItem.Text = "Vista detallada";
             this.vistaDetalladaToolStripMenuItem.Click += new System.EventHandler(this.vistaDetalladaToolStripMenuItem_Click);
             // 
             // vistaGráficaToolStripMenuItem
             // 
             this.vistaGráficaToolStripMenuItem.Name = "vistaGráficaToolStripMenuItem";
-            this.vistaGráficaToolStripMenuItem.Size = new System.Drawing.Size(267, 40);
+            this.vistaGráficaToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.vistaGráficaToolStripMenuItem.Text = "Vista gráfica";
             this.vistaGráficaToolStripMenuItem.Click += new System.EventHandler(this.vistaGraficaToolStripMenuItem_Click);
             // 
             // graphPanel
             // 
-            this.graphPanel.Location = new System.Drawing.Point(1325, 50);
-            this.graphPanel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.graphPanel.Location = new System.Drawing.Point(723, 27);
             this.graphPanel.Name = "graphPanel";
-            this.graphPanel.Size = new System.Drawing.Size(65, 678);
+            this.graphPanel.Size = new System.Drawing.Size(24, 367);
             this.graphPanel.TabIndex = 15;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1390, 724);
+            this.ClientSize = new System.Drawing.Size(747, 392);
             this.Controls.Add(this.graphPanel);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.txtCacheIndicator);
@@ -273,7 +258,6 @@
             this.Controls.Add(this.txtPath);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "Form1";
             this.Text = "SpaceScanner";
             ((System.ComponentModel.ISupportInitialize)(this.gridResults)).EndInit();
