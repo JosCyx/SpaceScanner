@@ -49,16 +49,16 @@ Permite explorar carpetas, identificar archivos o directorios que ocupan demasia
 ---
 
 ## 🧠 Detalles técnicos
-- Los resultados se almacenan en un Dictionary<string, ScanResult> (scanCache) para evitar recálculos.
+- Los resultados se almacenan en un `Dictionary<string, ScanResult>` (scanCache) para evitar recálculos.
 
-- Se mantiene un historial de navegación (Stack<string> navigationHistory) que permite moverse entre rutas escaneadas.
+- Se mantiene un historial de navegación `(Stack<string> navigationHistory)` que permite moverse entre rutas escaneadas.
 
 - Cada escaneo calcula:
   Tamaño total de la carpeta
   Espacio libre y total del disco
   Tamaño individual de archivos y subcarpetas
 
-- La comparación con el límite de tamaño (txtSize) se hace en MB, con soporte para unidades: KB, MB, GB, TB.
+- La comparación con el límite de tamaño (`txtSize`) se hace en MB, con soporte para unidades: KB, MB, GB, TB.
 
 ---
 
