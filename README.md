@@ -64,3 +64,10 @@ Permite explorar carpetas, identificar archivos o directorios que ocupan demasia
 
 ## 🧩 Próximas mejoras
 1. **Modo gráfico** para visualizar de manera más amigable los directorios escaneados.
+
+---
+
+## 🪪 Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
+Puedes usarlo, modificarlo y compartirlo libremente, siempre que se mantenga la atribución correspondiente.
