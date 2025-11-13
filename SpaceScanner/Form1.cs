@@ -234,7 +234,6 @@ namespace SpaceScanner
 
                 scanCache[rootPath] = result;
 
-
                 if (!token.IsCancellationRequested)
                 {
                     btnStop.Enabled = false;
