@@ -92,7 +92,6 @@ namespace SpaceScanner
                 return;
             }
 
-
             lblTotalSize.Text = "Calculando...";
             lblFreeSize.Text = "";
             lblGlobalSize.Text = "";
@@ -174,7 +173,6 @@ namespace SpaceScanner
 
                             //hacer negrita si el tamano es excesivo
                             gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, sizeMB > limiteExcesivoMB ? FontStyle.Bold : FontStyle.Regular);
-
                         }));
                     }
 
@@ -390,7 +388,6 @@ namespace SpaceScanner
 
         private void btnBack_Click(object sender, EventArgs e)
         {
-
             if (navigationHistory.Count > 0)
             {
                 string previous = navigationHistory.Pop();
