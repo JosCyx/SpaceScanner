@@ -167,12 +167,17 @@ namespace SpaceScanner
                                 estadoCarpeta
                             );
                             gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
-                            //setear las letras del estado en rojo si es exesesivo
 
-                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = sizeMB > limiteExcesivoMB ? Color.Red : Color.Green;
-
-                            //hacer negrita si el tamano es excesivo
-                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, sizeMB > limiteExcesivoMB ? FontStyle.Bold : FontStyle.Regular);
+                            if (sizeMB > limiteExcesivoMB)
+                            {
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
+                            }
+                            else
+                            {
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
+                            }
                         }));
                     }
 
@@ -199,8 +204,17 @@ namespace SpaceScanner
                                 estadoArchivo
                             );
                             gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Azure;
-                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = sizeMB > limiteExcesivoMB ? Color.Red : Color.Green;
-                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, sizeMB > limiteExcesivoMB ? FontStyle.Bold : FontStyle.Regular);
+
+                            if (sizeMB > limiteExcesivoMB)
+                            {
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
+                            }
+                            else
+                            {
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
+                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
+                            }
                         }));
                     }
                 });
