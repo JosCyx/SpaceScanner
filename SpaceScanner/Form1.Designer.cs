@@ -1,4 +1,4 @@
-﻿namespace SpaceScanner
+namespace SpaceScanner
 {
     partial class Form1
     {
@@ -43,6 +43,9 @@
             this.escanearRutaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label2 = new System.Windows.Forms.Label();
             this.txtSize = new System.Windows.Forms.TextBox();
+            this.chkDeepScan = new System.Windows.Forms.CheckBox();
+            this.lblLevels = new System.Windows.Forms.Label();
+            this.numLevels = new System.Windows.Forms.NumericUpDown();
             this.btnAtras = new System.Windows.Forms.Button();
             this.txtCacheIndicator = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -51,6 +54,7 @@
             this.vistaGráficaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.graphPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.gridResults)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLevels)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -173,6 +177,50 @@
             this.txtSize.Size = new System.Drawing.Size(94, 20);
             this.txtSize.TabIndex = 11;
             // 
+            // chkDeepScan
+            // 
+            this.chkDeepScan.AutoSize = true;
+            this.chkDeepScan.Checked = true;
+            this.chkDeepScan.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDeepScan.Location = new System.Drawing.Point(175, 61);
+            this.chkDeepScan.Name = "chkDeepScan";
+            this.chkDeepScan.Size = new System.Drawing.Size(115, 17);
+            this.chkDeepScan.TabIndex = 16;
+            this.chkDeepScan.Text = "Escaneo profundo";
+            this.chkDeepScan.UseVisualStyleBackColor = true;
+            this.chkDeepScan.CheckedChanged += new System.EventHandler(this.chkDeepScan_CheckedChanged);
+            // 
+            // lblLevels
+            // 
+            this.lblLevels.AutoSize = true;
+            this.lblLevels.Location = new System.Drawing.Point(294, 62);
+            this.lblLevels.Name = "lblLevels";
+            this.lblLevels.Size = new System.Drawing.Size(45, 13);
+            this.lblLevels.TabIndex = 17;
+            this.lblLevels.Text = "Niveles:";
+            // 
+            // numLevels
+            // 
+            this.numLevels.Location = new System.Drawing.Point(344, 60);
+            this.numLevels.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.numLevels.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numLevels.Name = "numLevels";
+            this.numLevels.Size = new System.Drawing.Size(42, 20);
+            this.numLevels.TabIndex = 18;
+            this.numLevels.Value = new decimal(new int[] {
+            7,
+            0,
+            0,
+            0});
+            // 
             // btnAtras
             // 
             this.btnAtras.BackColor = System.Drawing.SystemColors.Control;
@@ -190,7 +238,7 @@
             this.txtCacheIndicator.AutoSize = true;
             this.txtCacheIndicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtCacheIndicator.ForeColor = System.Drawing.Color.Red;
-            this.txtCacheIndicator.Location = new System.Drawing.Point(553, 67);
+            this.txtCacheIndicator.Location = new System.Drawing.Point(530, 67);
             this.txtCacheIndicator.Name = "txtCacheIndicator";
             this.txtCacheIndicator.Size = new System.Drawing.Size(128, 9);
             this.txtCacheIndicator.TabIndex = 13;
@@ -246,6 +294,9 @@
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.txtCacheIndicator);
             this.Controls.Add(this.btnAtras);
+            this.Controls.Add(this.numLevels);
+            this.Controls.Add(this.lblLevels);
+            this.Controls.Add(this.chkDeepScan);
             this.Controls.Add(this.txtSize);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btnStop);
@@ -261,6 +312,7 @@
             this.Name = "Form1";
             this.Text = "SpaceScanner";
             ((System.ComponentModel.ISupportInitialize)(this.gridResults)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLevels)).EndInit();
             this.contextMenuGrid.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -284,6 +336,9 @@
         private System.Windows.Forms.ToolStripMenuItem escanearRutaToolStripMenuItem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtSize;
+        private System.Windows.Forms.CheckBox chkDeepScan;
+        private System.Windows.Forms.Label lblLevels;
+        private System.Windows.Forms.NumericUpDown numLevels;
         private System.Windows.Forms.Button btnAtras;
         private System.Windows.Forms.Label txtCacheIndicator;
         private System.Windows.Forms.MenuStrip menuStrip1;

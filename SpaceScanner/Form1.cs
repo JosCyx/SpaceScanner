@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -41,9 +41,15 @@ namespace SpaceScanner
             gridResults.MouseDown += gridResults_MouseDown;
         }
 
-        private async void btnScan_Click(object sender, EventArgs e)
+        private void btnScan_Click(object sender, EventArgs e)
         {
             EscanearRuta(false);
+        }
+
+        private void chkDeepScan_CheckedChanged(object sender, EventArgs e)
+        {
+            numLevels.Enabled = chkDeepScan.Checked;
+            lblLevels.Enabled = chkDeepScan.Checked;
         }
 
         private async void EscanearRuta(bool takeHistorial)
@@ -62,6 +68,9 @@ namespace SpaceScanner
                 return;
             }
 
+            //obtener el límite de tamaño desde txtSize (en MB)
+            double limiteExcesivoMB = ParseSize(txtSize.Text);
+
             //verificar si ya existe en caché
             if (scanCache.ContainsKey(rootPath) && takeHistorial)
             {
@@ -78,14 +87,34 @@ namespace SpaceScanner
 
                 foreach (var item in cached.Items)
                 {
-                    int rowIndex = gridResults.Rows.Add(item.Name, item.Path, item.Type, item.SizeMB.ToString("N2"), item.Estado);
+                    string estado = item.SizeMB > limiteExcesivoMB ? "⚠️ Excesivo" : "✅ Normal";
+                    int rowIndex = gridResults.Rows.Add(item.Name, item.Path, item.Type, item.SizeMB.ToString("N2"), estado);
                     gridResults.Rows[rowIndex].DefaultCellStyle.BackColor =
                         item.Type == "Carpeta" ? Color.LightYellow : Color.Azure;
+
+                    if (item.SizeMB > limiteExcesivoMB)
+                    {
+                        gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
+                        gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
+                    }
+                    else
+                    {
+                        gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
+                        gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
+                    }
                 }
 
                 lblTotalSize.Text = $"Total ruta: {cached.TotalSizeMB:N2} MB";
                 lblFreeSize.Text = $"Libre: {cached.FreeSpaceMB:N2} MB";
                 lblGlobalSize.Text = $"Total disco: {cached.DiskTotalMB:N2} MB";
+
+                btnStop.Enabled = false;
+                btnScan.Enabled = true;
+                btnAtras.Enabled = navigationHistory.Count > 0;
+                txtSize.ReadOnly = false;
+                txtPath.ReadOnly = false;
+                chkDeepScan.Enabled = true;
+                numLevels.Enabled = chkDeepScan.Checked;
 
                 txtCacheIndicator.Visible = true;
                 //MessageBox.Show("Datos cargados desde memoria.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -97,12 +126,14 @@ namespace SpaceScanner
             lblGlobalSize.Text = "";
             btnStop.Enabled = true;
             btnScan.Enabled = false;
+            btnAtras.Enabled = false;
             txtSize.ReadOnly = true;
             txtPath.ReadOnly = true;
+            chkDeepScan.Enabled = false;
+            numLevels.Enabled = false;
             takeHistorial = false;
 
-            //obtener el límite de tamaño desde txtSize (en MB)
-            double limiteExcesivoMB = ParseSize(txtSize.Text);
+            int maxDepth = chkDeepScan.Checked ? (int)numLevels.Value : 1;
 
             //cancelar cualquier escaneo previo
             cts?.Cancel();
@@ -110,13 +141,16 @@ namespace SpaceScanner
             var token = cts.Token;
 
             string driveRoot = Path.GetPathRoot(rootPath);
-            DriveInfo drive = null;
+            double driveFreeMB = 0;
+            double driveTotalMB = 0;
 
             try
             {
-                drive = new DriveInfo(driveRoot);
-                lblFreeSize.Text = $"Libre: {(drive.AvailableFreeSpace / (1024.0 * 1024)).ToString("N2")} MB";
-                lblGlobalSize.Text = $"Total disco: {(drive.TotalSize / (1024.0 * 1024)).ToString("N2")} MB";
+                DriveInfo drive = new DriveInfo(driveRoot);
+                driveFreeMB = drive.AvailableFreeSpace / (1024.0 * 1024);
+                driveTotalMB = drive.TotalSize / (1024.0 * 1024);
+                lblFreeSize.Text = $"Libre: {driveFreeMB:N2} MB";
+                lblGlobalSize.Text = $"Total disco: {driveTotalMB:N2} MB";
             }
             catch
             {
@@ -133,126 +167,24 @@ namespace SpaceScanner
             gridResults.Columns.Add("ColStatus", "Estado"); // columna de estado
             gridResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            string[] directories = Array.Empty<string>();
-            string[] files = Array.Empty<string>();
-
-            try { directories = Directory.GetDirectories(rootPath); } catch { }
-            try { files = Directory.GetFiles(rootPath); } catch { }
-
             long totalSize = 0;
 
             try
             {
                 await Task.Run(() =>
                 {
-                    int count = 0;
-
-                    //directorios
-                    foreach (var dir in directories)
-                    {
-                        if (token.IsCancellationRequested) return;
-                        long size = GetDirectorySizeSafe(dir, ref count, token);
-                        totalSize += size;
-
-                        this.Invoke((Action)(() =>
-                        {
-                            double sizeMB = size / (1024.0 * 1024);
-                            string estadoCarpeta = sizeMB > limiteExcesivoMB ? "⚠️ Excesivo" : "✅ Normal";
-
-                            int rowIndex = gridResults.Rows.Add(
-                                Path.GetFileName(dir),
-                                dir,
-                                "Carpeta",
-                                sizeMB.ToString("N2"),
-                                estadoCarpeta
-                            );
-                            gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
-
-                            if (sizeMB > limiteExcesivoMB)
-                            {
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
-                            }
-                            else
-                            {
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
-                            }
-                        }));
-                    }
-
-                    //archivos
-                    foreach (var file in files)
-                    {
-                        if (token.IsCancellationRequested) return;
-                        long size = 0;
-                        try { size = new FileInfo(file).Length; } catch { }
-
-                        totalSize += size;
-                        count++;
-
-                        this.Invoke((Action)(() =>
-                        {
-                            double sizeMB = size / (1024.0 * 1024);
-                            string estadoArchivo = sizeMB > limiteExcesivoMB ? "⚠️ Excesivo" : "✅ Normal";
-
-                            int rowIndex = gridResults.Rows.Add(
-                                Path.GetFileName(file),
-                                file,
-                                "Archivo",
-                                sizeMB.ToString("N2"),
-                                estadoArchivo
-                            );
-                            gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Azure;
-
-                            if (sizeMB > limiteExcesivoMB)
-                            {
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
-                            }
-                            else
-                            {
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
-                                gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
-                            }
-                        }));
-                    }
+                    totalSize = ScanDirectoryNode(rootPath, 1, maxDepth, limiteExcesivoMB, driveFreeMB, driveTotalMB, token, true);
                 });
-
-                var items = new List<ScanItem>();
-
-                foreach (DataGridViewRow row in gridResults.Rows)
-                {
-                    if (!row.IsNewRow)
-                    {
-                        items.Add(new ScanItem
-                        {
-                            Name = row.Cells["ColName"].Value.ToString(),
-                            Path = row.Cells["ColPath"].Value.ToString(),
-                            Type = row.Cells["ColType"].Value.ToString(),
-                            SizeMB = double.Parse(row.Cells["ColSize"].Value.ToString()),
-                            Estado = row.Cells["ColStatus"].Value.ToString()
-                        });
-                    }
-                }
-
-                var result = new ScanResult
-                {
-                    Items = items,
-                    TotalSizeMB = totalSize / (1024.0 * 1024),
-                    FreeSpaceMB = drive.AvailableFreeSpace / (1024.0 * 1024),
-                    DiskTotalMB = drive.TotalSize / (1024.0 * 1024)
-                };
-
-                scanCache[rootPath] = result;
 
                 if (!token.IsCancellationRequested)
                 {
                     btnStop.Enabled = false;
                     btnScan.Enabled = true;
-                    btnAtras.Enabled = true;
+                    btnAtras.Enabled = navigationHistory.Count > 0;
                     txtSize.ReadOnly = false;
                     txtPath.ReadOnly = false;
+                    chkDeepScan.Enabled = true;
+                    numLevels.Enabled = chkDeepScan.Checked;
                     lblTotalSize.Text = $"Total ruta: {(totalSize / (1024.0 * 1024)).ToString("N2")} MB";
                     MessageBox.Show("Escaneo terminado.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -260,9 +192,11 @@ namespace SpaceScanner
                 {
                     btnStop.Enabled = false;
                     btnScan.Enabled = true;
-                    btnAtras.Enabled = false;
+                    btnAtras.Enabled = navigationHistory.Count > 0;
                     txtSize.ReadOnly = false;
                     txtPath.ReadOnly = false;
+                    chkDeepScan.Enabled = true;
+                    numLevels.Enabled = chkDeepScan.Checked;
                     gridResults.Rows.Clear();
                     gridResults.Columns.Clear();
                     lblTotalSize.Text = "Escaneo cancelado";
@@ -271,8 +205,171 @@ namespace SpaceScanner
             }
             catch
             {
+                btnStop.Enabled = false;
+                btnScan.Enabled = true;
+                btnAtras.Enabled = navigationHistory.Count > 0;
+                txtSize.ReadOnly = false;
+                txtPath.ReadOnly = false;
+                chkDeepScan.Enabled = true;
+                numLevels.Enabled = chkDeepScan.Checked;
                 lblTotalSize.Text = "Error durante el escaneo";
             }
+        }
+
+        private long ScanDirectoryNode(string dirPath, int currentDepth, int maxDepth, double limiteExcesivoMB, double freeMB, double diskMB, CancellationToken token, bool isRoot)
+        {
+            if (token.IsCancellationRequested) return 0;
+
+            long totalDirSize = 0;
+            var items = new List<ScanItem>();
+
+            // Obtener archivos directos
+            string[] files = Array.Empty<string>();
+            try { files = Directory.GetFiles(dirPath); } catch { }
+
+            foreach (var file in files)
+            {
+                if (token.IsCancellationRequested) return totalDirSize;
+                long fSize = 0;
+                try { fSize = new FileInfo(file).Length; } catch { }
+
+                totalDirSize += fSize;
+                double fSizeMB = fSize / (1024.0 * 1024);
+                string fEstado = fSizeMB > limiteExcesivoMB ? "⚠️ Excesivo" : "✅ Normal";
+
+                items.Add(new ScanItem
+                {
+                    Name = Path.GetFileName(file),
+                    Path = file,
+                    Type = "Archivo",
+                    SizeMB = fSizeMB,
+                    Estado = fEstado
+                });
+            }
+
+            // Si es la raíz, agregar archivos al grid al inicio
+            if (isRoot && files.Length > 0 && !token.IsCancellationRequested)
+            {
+                this.BeginInvoke((Action)(() =>
+                {
+                    if (token.IsCancellationRequested) return;
+                    foreach (var fileItem in items.Where(i => i.Type == "Archivo"))
+                    {
+                        int rowIndex = gridResults.Rows.Add(
+                            fileItem.Name,
+                            fileItem.Path,
+                            fileItem.Type,
+                            fileItem.SizeMB.ToString("N2"),
+                            fileItem.Estado
+                        );
+                        gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Azure;
+
+                        if (fileItem.SizeMB > limiteExcesivoMB)
+                        {
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
+                        }
+                        else
+                        {
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
+                        }
+                    }
+                }));
+            }
+
+            // Obtener subdirectorios directos
+            string[] subDirs = Array.Empty<string>();
+            try { subDirs = Directory.GetDirectories(dirPath); } catch { }
+
+            foreach (var subDir in subDirs)
+            {
+                if (token.IsCancellationRequested) return totalDirSize;
+
+                // Omitir enlaces simbólicos y puntos de reanálisis para evitar ciclos infinitos (ej. Application Data)
+                try
+                {
+                    var di = new DirectoryInfo(subDir);
+                    if ((di.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+                    {
+                        continue;
+                    }
+                }
+                catch { }
+
+                long subDirSize = 0;
+                if (currentDepth < maxDepth)
+                {
+                    // Escaneo recursivo y población de caché para niveles inferiores
+                    subDirSize = ScanDirectoryNode(subDir, currentDepth + 1, maxDepth, limiteExcesivoMB, freeMB, diskMB, token, false);
+                }
+                else
+                {
+                    // Nivel límite alcanzado: cálculo recursivo del tamaño sin expandir caché de niveles más profundos
+                    int count = 0;
+                    subDirSize = GetDirectorySizeSafe(subDir, ref count, token);
+                }
+
+                totalDirSize += subDirSize;
+                double subSizeMB = subDirSize / (1024.0 * 1024);
+                string dEstado = subSizeMB > limiteExcesivoMB ? "⚠️ Excesivo" : "✅ Normal";
+
+                items.Add(new ScanItem
+                {
+                    Name = Path.GetFileName(subDir),
+                    Path = subDir,
+                    Type = "Carpeta",
+                    SizeMB = subSizeMB,
+                    Estado = dEstado
+                });
+
+                // Si es la ruta raíz mostrada, actualizar el grid en tiempo real a medida que cada carpeta termina su cálculo
+                if (isRoot && !token.IsCancellationRequested)
+                {
+                    this.BeginInvoke((Action)(() =>
+                    {
+                        if (token.IsCancellationRequested) return;
+                        int rowIndex = gridResults.Rows.Add(
+                            Path.GetFileName(subDir),
+                            subDir,
+                            "Carpeta",
+                            subSizeMB.ToString("N2"),
+                            dEstado
+                        );
+                        gridResults.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
+
+                        if (subSizeMB > limiteExcesivoMB)
+                        {
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Red;
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Bold);
+                        }
+                        else
+                        {
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.ForeColor = Color.Green;
+                            gridResults.Rows[rowIndex].Cells["ColStatus"].Style.Font = new Font(gridResults.Font, FontStyle.Regular);
+                        }
+
+                        lblTotalSize.Text = $"Total acumulado: {(totalDirSize / (1024.0 * 1024)).ToString("N2")} MB";
+                    }));
+                }
+            }
+
+            // Guardar en caché el resultado completo de este directorio
+            if (!token.IsCancellationRequested)
+            {
+                lock (scanCache)
+                {
+                    scanCache[dirPath] = new ScanResult
+                    {
+                        Items = items,
+                        TotalSizeMB = totalDirSize / (1024.0 * 1024),
+                        FreeSpaceMB = freeMB,
+                        DiskTotalMB = diskMB
+                    };
+                }
+            }
+
+            return totalDirSize;
         }
 
         private double ParseSize(string text)
@@ -304,7 +401,6 @@ namespace SpaceScanner
             return valor;
         }
 
-
         private long GetDirectorySizeSafe(string path, ref int count, CancellationToken token)
         {
             long size = 0;
@@ -323,6 +419,13 @@ namespace SpaceScanner
                 foreach (string dir in dirs)
                 {
                     if (token.IsCancellationRequested) return size;
+                    try
+                    {
+                        var di = new DirectoryInfo(dir);
+                        if ((di.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+                            continue;
+                    }
+                    catch { }
                     size += GetDirectorySizeSafe(dir, ref count, token);
                 }
             }
@@ -380,6 +483,9 @@ namespace SpaceScanner
         {
             if (gridResults.SelectedRows.Count > 0)
             {
+                string tipo = gridResults.SelectedRows[0].Cells["ColType"].Value?.ToString();
+                if (tipo != "Carpeta") return;
+
                 navigationHistory.Push(currentPath); // guardar la ruta actual
                 string ruta = gridResults.SelectedRows[0].Cells["ColPath"].Value.ToString();
                 txtPath.Text = ruta;
@@ -390,6 +496,9 @@ namespace SpaceScanner
         private void escanearRutaToolStripMenuItem_DoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
+
+            string tipo = gridResults.Rows[e.RowIndex].Cells["ColType"].Value?.ToString();
+            if (tipo != "Carpeta") return;
 
             // Obtener la ruta desde la fila doble clickeada
             string ruta = gridResults.Rows[e.RowIndex].Cells["ColPath"].Value?.ToString();
