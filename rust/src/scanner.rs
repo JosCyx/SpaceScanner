@@ -52,7 +52,7 @@ pub fn get_disk_info(target_path: &Path) -> (u64, u64) {
         let mount_str = disk.mount_point().to_string_lossy();
         if target_str.starts_with(mount_str.as_ref()) {
             let match_len = mount_str.len();
-            if best_match.as_ref().map_or(true, |(len, _, _)| match_len > *len) {
+            if best_match.as_ref().is_none_or(|(len, _, _)| match_len > *len) {
                 best_match = Some((match_len, disk.available_space(), disk.total_space()));
             }
         }
@@ -131,7 +131,7 @@ impl ScanReporter {
         let last_ms = self.last_notify_ms.load(Ordering::Relaxed);
 
         // Throttle fluido: emitir actualización cada 100 archivos o cada 50ms
-        if count % 100 == 0 || now_ms.saturating_sub(last_ms) >= 50 {
+        if count.is_multiple_of(100) || now_ms.saturating_sub(last_ms) >= 50 {
             if self
                 .last_notify_ms
                 .compare_exchange(last_ms, now_ms, Ordering::Relaxed, Ordering::Relaxed)

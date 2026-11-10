@@ -13,11 +13,55 @@ permissions:
   contents: write
 
 jobs:
-  # ==========================================
-  # 1. WINDOWS: Compila Rust (.exe) y C# (.NET)
-  # ==========================================
+  # ===============================================================
+  # FASE 1: QUALITY GATES (Se ejecutan en paralelo al inicio)
+  # ===============================================================
+  unit-tests:
+    name: 🧪 Pruebas Unitarias
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Instalar librerías gráficas para pruebas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libgtk-3-dev
+
+      - name: Ejecutar pruebas unitarias (8 tests)
+        working-directory: ./rust
+        run: cargo test --verbose
+
+  code-quality:
+    name: 🔍 Calidad y Análisis Estático (Clippy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust con Clippy
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Instalar librerías gráficas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libgtk-3-dev
+
+      - name: Ejecutar análisis estático (Linter)
+        working-directory: ./rust
+        run: cargo clippy -- -D warnings
+
+  # ===============================================================
+  # FASE 2: COMPILACIÓN MULTIPLATAFORMA (Bloqueada si falla la Fase 1)
+  # ===============================================================
   build-windows:
-    name: Windows (Rust .exe + C# Legacy)
+    name: 🪟 Windows (Rust .exe + C# Legacy)
+    needs: [unit-tests, code-quality]
     runs-on: windows-latest
     steps:
       - name: Clonar repositorio
@@ -53,11 +97,9 @@ jobs:
             SpaceScanner-windows-x64.exe
             SpaceScanner-v1.0.0-csharp-legacy.zip
 
-  # ==========================================
-  # 2. LINUX: Compila binario + paquete .deb
-  # ==========================================
   build-linux:
-    name: Linux (Portable + .deb)
+    name: 🐧 Linux (Portable + .deb)
+    needs: [unit-tests, code-quality]
     runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
@@ -71,10 +113,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libgtk-3-dev
           cargo install cargo-deb
-
-      - name: Ejecutar pruebas unitarias
-        working-directory: ./rust
-        run: cargo test
 
       - name: Compilar Rust Release
         working-directory: ./rust
@@ -99,11 +137,9 @@ jobs:
             SpaceScanner-linux-x64.tar.gz
             SpaceScanner-linux-amd64.deb
 
-  # ==========================================
-  # 3. macOS: Compila ejecutable para Mac
-  # ==========================================
   build-macos:
-    name: macOS (Portable)
+    name: 🍏 macOS (Portable)
+    needs: [unit-tests, code-quality]
     runs-on: macos-latest
     steps:
       - name: Clonar repositorio
@@ -126,11 +162,11 @@ jobs:
           name: macos-artifacts
           path: SpaceScanner-macos-x64.tar.gz
 
-  # ==========================================
-  # 4. PUBLICACIÓN OFICIAL (Solo con Git Tag)
-  # ==========================================
+  # ===============================================================
+  # FASE 3: PUBLICACIÓN OFICIAL (Solo con Git Tag)
+  # ===============================================================
   publish-release:
-    name: Publicar Release Oficial en GitHub
+    name: 🚀 Publicar Release Oficial en GitHub
     needs: [build-windows, build-linux, build-macos]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
