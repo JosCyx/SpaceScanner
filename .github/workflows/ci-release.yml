@@ -57,7 +57,8 @@ jobs:
         run: cargo clippy -- -D warnings
 
   # ===============================================================
-  # FASE 2: COMPILACIÓN MULTIPLATAFORMA (Bloqueada si falla la Fase 1)
+  # FASE 2: COMPILACIÓN Y PUBLICACIÓN DIFERIDA POR SISTEMA OPERATIVO
+  # (Cada SO publica de inmediato en cuanto termina de compilar)
   # ===============================================================
   build-windows:
     name: 🪟 Windows (Rust .exe + C# Legacy)
@@ -89,13 +90,23 @@ jobs:
       - name: Preparar ejecutable de Rust
         run: copy rust\target\release\spacescanner.exe SpaceScanner-windows-x64.exe
 
-      - name: Subir artefactos de Windows
+      - name: Guardar artefactos en Actions
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
           path: |
             SpaceScanner-windows-x64.exe
             SpaceScanner-v1.0.0-csharp-legacy.zip
+
+      # Publicar / Agregar directamente al Release si es un Tag
+      - name: Publicar / Agregar binarios de Windows al Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            SpaceScanner-windows-x64.exe
+            SpaceScanner-v1.0.0-csharp-legacy.zip
+          generate_release_notes: true
 
   build-linux:
     name: 🐧 Linux (Portable + .deb)
@@ -129,13 +140,23 @@ jobs:
       - name: Mover instalador .deb
         run: cp rust/target/debian/*.deb ./SpaceScanner-linux-amd64.deb
 
-      - name: Subir artefactos de Linux
+      - name: Guardar artefactos en Actions
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifacts
           path: |
             SpaceScanner-linux-x64.tar.gz
             SpaceScanner-linux-amd64.deb
+
+      # Publicar / Agregar directamente al Release si es un Tag
+      - name: Publicar / Agregar binarios de Linux al Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            SpaceScanner-linux-x64.tar.gz
+            SpaceScanner-linux-amd64.deb
+          generate_release_notes: true
 
   build-macos:
     name: 🍏 macOS (Portable)
@@ -156,41 +177,16 @@ jobs:
         run: |
           tar -czvf SpaceScanner-macos-x64.tar.gz -C rust/target/release spacescanner
 
-      - name: Subir artefacto de macOS
+      - name: Guardar artefactos en Actions
         uses: actions/upload-artifact@v4
         with:
           name: macos-artifacts
           path: SpaceScanner-macos-x64.tar.gz
 
-  # ===============================================================
-  # FASE 3: PUBLICACIÓN OFICIAL (Solo con Git Tag)
-  # ===============================================================
-  publish-release:
-    name: 🚀 Publicar Release Oficial en GitHub
-    needs: [build-windows, build-linux, build-macos]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Descargar artefactos de Windows
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-artifacts
-          path: dist
-
-      - name: Descargar artefactos de Linux
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-artifacts
-          path: dist
-
-      - name: Descargar artefactos de macOS
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-artifacts
-          path: dist
-
-      - name: Publicar Release Oficial en GitHub
+      # Publicar / Agregar directamente al Release si es un Tag
+      - name: Publicar / Agregar binarios de macOS al Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: SpaceScanner-macos-x64.tar.gz
           generate_release_notes: true
