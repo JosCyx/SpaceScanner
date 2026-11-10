@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SpaceScanner
+Comment=Modern High-Performance Disk Space Analyzer and Visualizer
+Exec=spacescanner
+Icon=system-file-manager
+Terminal=false
+Type=Application
+Categories=Utility;System;Filesystem;
+StartupNotify=true

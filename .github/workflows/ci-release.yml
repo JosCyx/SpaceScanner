@@ -1,0 +1,160 @@
+name: SpaceScanner CI / Release
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # ==========================================
+  # 1. WINDOWS: Compila Rust (.exe) y C# (.NET)
+  # ==========================================
+  build-windows:
+    name: Windows (Rust .exe + C# Legacy)
+    runs-on: windows-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Configurar MSBuild (.NET)
+        uses: microsoft/setup-msbuild@v2
+
+      # Compilar versión clásica C# WinForms
+      - name: Compilar C# WinForms Legacy
+        run: msbuild csharp/SpaceScanner.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Empaquetar C# Legacy en ZIP
+        run: |
+          Compress-Archive -Path csharp/SpaceScanner/bin/Release/* -DestinationPath SpaceScanner-v1.0.0-csharp-legacy.zip
+
+      # Compilar versión moderna Rust
+      - name: Compilar Rust Release
+        working-directory: ./rust
+        run: cargo build --release
+
+      - name: Preparar ejecutable de Rust
+        run: copy rust\target\release\spacescanner.exe SpaceScanner-windows-x64.exe
+
+      - name: Subir artefactos de Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            SpaceScanner-windows-x64.exe
+            SpaceScanner-v1.0.0-csharp-legacy.zip
+
+  # ==========================================
+  # 2. LINUX: Compila binario + paquete .deb
+  # ==========================================
+  build-linux:
+    name: Linux (Portable + .deb)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Instalar dependencias del sistema y cargo-deb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libgtk-3-dev
+          cargo install cargo-deb
+
+      - name: Ejecutar pruebas unitarias
+        working-directory: ./rust
+        run: cargo test
+
+      - name: Compilar Rust Release
+        working-directory: ./rust
+        run: cargo build --release
+
+      - name: Empaquetar ejecutable portátil (.tar.gz)
+        run: |
+          tar -czvf SpaceScanner-linux-x64.tar.gz -C rust/target/release spacescanner
+
+      - name: Generar paquete instalador .deb
+        working-directory: ./rust
+        run: cargo deb --no-build
+
+      - name: Mover instalador .deb
+        run: cp rust/target/debian/*.deb ./SpaceScanner-linux-amd64.deb
+
+      - name: Subir artefactos de Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            SpaceScanner-linux-x64.tar.gz
+            SpaceScanner-linux-amd64.deb
+
+  # ==========================================
+  # 3. macOS: Compila ejecutable para Mac
+  # ==========================================
+  build-macos:
+    name: macOS (Portable)
+    runs-on: macos-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Compilar Rust Release
+        working-directory: ./rust
+        run: cargo build --release
+
+      - name: Empaquetar ejecutable macOS (.tar.gz)
+        run: |
+          tar -czvf SpaceScanner-macos-x64.tar.gz -C rust/target/release spacescanner
+
+      - name: Subir artefacto de macOS
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-artifacts
+          path: SpaceScanner-macos-x64.tar.gz
+
+  # ==========================================
+  # 4. PUBLICACIÓN OFICIAL (Solo con Git Tag)
+  # ==========================================
+  publish-release:
+    name: Publicar Release Oficial en GitHub
+    needs: [build-windows, build-linux, build-macos]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar artefactos de Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifacts
+          path: dist
+
+      - name: Descargar artefactos de Linux
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-artifacts
+          path: dist
+
+      - name: Descargar artefactos de macOS
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-artifacts
+          path: dist
+
+      - name: Publicar Release Oficial en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

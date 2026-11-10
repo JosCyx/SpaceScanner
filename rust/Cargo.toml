@@ -1,0 +1,28 @@
+[package]
+name = "spacescanner"
+version = "2.0.0"
+edition = "2024"
+authors = ["JosCyx"]
+description = "Modern High-Performance Disk Space Analyzer and Visualizer"
+license = "MIT"
+repository = "https://github.com/JosCyx/SpaceScanner"
+
+[dependencies]
+eframe = "0.28"
+egui_extras = "0.28"
+open = "5.3"
+rayon = "1.10"
+rfd = "0.14"
+sysinfo = "0.31"
+
+[package.metadata.deb]
+name = "spacescanner"
+maintainer = "JosCyx <https://github.com/JosCyx/SpaceScanner>"
+copyright = "2026 JosCyx"
+extended-description = "Modern High-Performance Disk Space Analyzer and Visualizer written in Rust with egui and Rayon."
+section = "utils"
+priority = "optional"
+assets = [
+    ["target/release/spacescanner", "usr/bin/spacescanner", "755"],
+    ["assets/spacescanner.desktop", "usr/share/applications/spacescanner.desktop", "644"],
+]

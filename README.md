@@ -1,73 +1,96 @@
 # 🧭 SpaceScanner
 
-**SpaceScanner** es una aplicación de escritorio en **C# (Windows Forms)** que analiza el uso de espacio en disco de forma visual e interactiva.  
-Permite explorar carpetas, identificar archivos o directorios que ocupan demasiado espacio y navegar entre resultados fácilmente, similar a herramientas como *SpaceSniffer* o *WinDirStat*.
+**SpaceScanner** es una herramienta de escritorio interactiva diseñada para analizar y visualizar el uso de espacio en disco de forma rápida y eficiente. Permite explorar directorios, identificar archivos o carpetas que consumen almacenamiento excesivo y navegar con fluidez entre rutas, similar a herramientas como *SpaceSniffer* o *WinDirStat*.
+
+El proyecto cuenta con dos implementaciones en este repositorio:
+1. **`csharp/`**: Implementación original para Windows desarrollada en **C# (.NET Framework / Windows Forms)**.
+2. **`rust/`**: Nueva versión de alto rendimiento y multiplataforma (**Linux y Windows**) desarrollada en **Rust**, con escaneo multi-hilo en paralelo y GUI nativa.
 
 ---
 
-## 🚀 Características principales
+## 📊 Comparativa Técnica de Implementaciones
 
-- 🔍 **Escaneo rápido y seguro** de carpetas, con cancelación en tiempo real.  
-- 💾 **Visualización del espacio utilizado** por cada archivo y subcarpeta.  
-- ⚠️ **Detección de elementos “excesivos”** según un tamaño límite configurable.  
-- 💡 **Caché inteligente**: los resultados escaneados se guardan en memoria, evitando volver a calcular rutas previamente analizadas.  
-- ↩️ **Navegación entre rutas**: puedes avanzar dentro de una carpeta o retroceder a la anterior sin perder los datos ya cargados.    
-- 🖱️ **Interacción con clic derecho o doble clic**:
-  - Abrir carpeta o archivo en el explorador de Windows.
-  - Escanear una subcarpeta directamente.
-
----
-
-## 🧩 Tecnologías utilizadas
-
-- **Lenguaje:** C#  
-- **Framework:** .NET Framework / Windows Forms  
-- **Librerías estándar:**  
-  - `System.IO` — para manejo de archivos y directorios  
-  - `System.Threading.Tasks` — para escaneo asincrónico  
-  - `System.Windows.Forms` — interfaz gráfica  
-  - `System.Drawing` — para renderizado visual  
+| Característica | Versión C# (.NET / WinForms) | Versión Rust (Multiplataforma) |
+| :--- | :--- | :--- |
+| **Sistemas Soportados** | Windows (7, 10, 11) | **Linux (Ubuntu, Fedora, etc.) y Windows** |
+| **Motor de Escaneo** | Secuencial (un hilo de CPU) | **Multi-hilo en paralelo (aprovecha todos los núcleos)** |
+| **Consumo de Memoria RAM** | ~150 MB – 300 MB (CLR + Garbage Collector) | **~10 MB – 25 MB (Gestión estricta sin GC)** |
+| **Velocidad de Escaneo** | Estándar para discos locales | **Extrema (optimizado para SSDs / NVMe)** |
+| **Dependencias / Runtime** | Requiere .NET Framework 4.7.2 | **Cero dependencias** (binario único nativo) |
+| **Distribución** | Ejecutable / Proyecto Visual Studio | **Binarios listos en Releases** (`.exe` y Linux ELF) |
 
 ---
 
-## ⚙️ Instalación y uso
+## 🚀 Características Principales
 
-1. Clona el repositorio:
+- 🔍 **Escaneo rápido con cancelación en tiempo real**: Detén el análisis en cualquier momento sin bloqueos.
+- 🌳 **Escaneo profundo configurable por niveles (*Deep Scan*)**: Permite definir cuántos niveles de subdirectorios analizar en profundidad para balancear velocidad y nivel de detalle.
+- ⚠️ **Detección visual de elementos excesivos**: Resalta en color aquellos archivos o carpetas que superen un umbral configurable (en KB, MB, GB o TB).
+- 💡 **Caché inteligente en memoria**: Almacena rutas ya analizadas (`Dictionary` / `HashMap`) para que regresar a una carpeta anterior sea instantáneo sin reescanear el disco.
+- ↩️ **Historial de navegación**: Navegación fluida hacia adelante y atrás mediante pila de historial (`Stack`).
+- 🖱️ **Acciones de contexto y exploración**:
+  - Doble clic en carpetas para adentrarse en su escaneo.
+  - Clic derecho para abrir el recurso en el explorador de archivos nativo (*Explorador de Windows* o *xdg-open* en Linux).
+- 💾 **Métricas globales de almacenamiento**: Muestra en tiempo real el espacio libre y total del disco junto al acumulado del directorio.
+
+---
+
+## 📁 Estructura del Repositorio
+
+```text
+SpaceScanner/
+├── csharp/                      # Proyecto en C# (.NET Framework 4.7.2 / WinForms)
+│   ├── SpaceScanner.sln
+│   └── SpaceScanner/
+│       ├── Form1.cs
+│       ├── Form1.Designer.cs
+│       └── ...
+├── rust/                        # Proyecto en Rust (Motor multi-hilo + GUI multiplataforma)
+│   ├── Cargo.toml
+│   └── src/
+│       └── main.rs
+└── README.md
+```
+
+---
+
+## ⚙️ Compilación y Uso
+
+### Versión C# (Windows)
+1. Abre [`csharp/SpaceScanner.sln`](file:///home/joss/Programs/SpaceScanner/csharp/SpaceScanner.sln) en **Visual Studio**.
+2. Selecciona la configuración `Release` o `Debug`.
+3. Presiona `Ctrl + F5` para compilar y ejecutar.
+
+### Versión Rust (Linux / Windows)
+1. Asegúrate de tener instalado Rust (`rustup` / `cargo`).
+2. Entra a la carpeta del proyecto:
    ```bash
-   git clone https://github.com/tuusuario/SpaceScanner.git
-2. Abre el proyecto en Visual Studio.
-
-3. Compila y ejecuta (Ctrl + F5).
-
-4. En la interfaz principal:
-- Introduce una ruta válida en el campo Ruta (txtPath).
-- Define el tamaño límite (por ejemplo, 500 MB, 2 GB, etc.).
-- Presiona Escanear para iniciar el análisis.
-
-5. Puedes detener el proceso con Detener o navegar con los botones de Atrás.
+   cd rust
+   ```
+3. Compila y ejecuta en modo optimizado:
+   ```bash
+   cargo run --release
+   ```
+*(También puedes descargar directamente los ejecutables precompilados desde la sección de **Releases** de este repositorio).*
 
 ---
 
-## 🧠 Detalles técnicos
-- Los resultados se almacenan en un `Dictionary<string, ScanResult>` (scanCache) para evitar recálculos.
+## 🧠 Detalles Técnicos y Arquitectura
 
-- Se mantiene un historial de navegación `(Stack<string> navigationHistory)` que permite moverse entre rutas escaneadas.
-
-- Cada escaneo calcula:
-  Tamaño total de la carpeta
-  Espacio libre y total del disco
-  Tamaño individual de archivos y subcarpetas
-
-- La comparación con el límite de tamaño (`txtSize`) se hace en MB, con soporte para unidades: KB, MB, GB, TB.
+- **Caché de resultados**: Cada carpeta analizada genera una estructura de resultados que se guarda en memoria para evitar llamadas de I/O repetidas al volver atrás.
+- **Manejo de Enlaces Simbólicos**: Ambos motores ignoran puntos de reanálisis (*Reparse Points* / Symlinks) para prevenir bucles infinitos en directorios del sistema.
+- **Conversión de Unidades**: Soporte para parsear límites de tamaño con sufijos `KB`, `MB`, `GB` y `TB`.
+- **Desacoplamiento de Interfaz**: En Rust, el escaneo se procesa en hilos de trabajo independientes y comunica el progreso a la interfaz gráfica mediante canales de mensajería (`mpsc`), garantizando que la ventana nunca se congele.
 
 ---
 
-## 🧩 Próximas mejoras
-1. **Modo gráfico** para visualizar de manera más amigable los directorios escaneados.
+## 🧩 Próximas Mejoras
+- [ ] Vista gráfica con mapa de rectángulos proporcionales (*Treemap*) para visualizar visualmente el peso de cada directorio.
+- [ ] Filtro por tipos y extensiones de archivo (videos, imágenes, código, comprimidos).
+- [ ] Integración de GitHub Actions para compilación automática y despliegue continuo en Releases.
 
 ---
 
 ## 🪪 Licencia
 
-Este proyecto se distribuye bajo la licencia MIT.
-Puedes usarlo, modificarlo y compartirlo libremente, siempre que se mantenga la atribución correspondiente.
+Este proyecto se distribuye bajo la licencia **MIT**. Puedes usarlo, modificarlo y compartirlo libremente manteniendo la atribución correspondiente.
