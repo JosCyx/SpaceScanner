@@ -4,6 +4,14 @@
 * text=auto
 
 ###############################################################################
+# GitHub Linguist Language Overrides
+###############################################################################
+*.rs linguist-detectable=true
+*.rs linguist-language=Rust
+rust/** linguist-detectable=true
+
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by
